@@ -1,1 +1,1 @@
-# Magicmux
+# magicmux
