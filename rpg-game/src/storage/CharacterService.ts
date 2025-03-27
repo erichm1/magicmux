@@ -38,3 +38,20 @@ export const createCharacter = async (name: string, classType: HeroClass) => {
   characters.push(newCharacter);
   await saveCharacters(characters);
 };
+
+
+const updateCharacter = async (updatedCharacter: Character) => {
+  try {
+    const characters = await loadCharacters();
+    const index = characters.findIndex(c => c.name === updatedCharacter.name);
+    if (index !== -1) {
+      characters[index] = updatedCharacter; // Update the character
+      await saveCharacters(characters); // Save the updated list
+      setCharacters(characters); // Update the state as well
+    }
+  } catch (error) {
+    console.error("Error updating character", error);
+  }
+};
+
+

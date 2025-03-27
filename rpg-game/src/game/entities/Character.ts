@@ -1,7 +1,7 @@
 import { Item } from "./Item";
-import { Skill } from "./Skill";
 import { SkillTree } from "./SkillTree";
 import { HeroClass } from "./HeroClass";
+import { Skill } from "./Skill";
 import { Equipment } from "./Equipment";
 import { GemType } from "./Gem";
 
@@ -177,6 +177,7 @@ export class Character {
     getStatBonus(type: GemType): number {
         return this.equipment.reduce((acc, eq) => acc + eq.getBonus(type), 0);
     }
+    
 
     equipItem(item: Item) {
         if (item.requiredClass !== this.classType) {
@@ -194,7 +195,23 @@ export class Character {
         };
       }
 
-    getExpToLevelUp(): number {
-        return this.level * 100;
+      getExpToLevelUp(): number {
+        return this.level * this.level * 50;  // Apply the new formula
     }
+    
+
+    attack(target: Character) {
+        // Calcula o dano baseado no poder de ataque do personagem
+        const damage = Math.max(0, this.attackPower); // Garantir que o dano não seja negativo
+        console.log(`${this.name} ataca ${target.name} causando ${damage} de dano!`);
+      
+        // Aplica o dano no alvo
+        target.takeDamage(damage);
+      
+        // Verifica se o monstro foi derrotado
+        if (target.life <= 0) {
+          console.log(`${target.name} foi derrotado!`);
+        }
+      }
+      
 }

@@ -12,6 +12,11 @@ export const saveCharacterState = async (character: Character) => {
       name: character.name,
       classType: character.classType,
       level: character.level,
+      experience: character.experience,
+      life: character.life,
+      maxLife: character.maxLife,
+      mana: character.mana,
+      maxMana: character.maxMana,
       equippedItems: character.equippedItems.map(item => ({
         name: item.name,
         type: item.type,
@@ -20,6 +25,11 @@ export const saveCharacterState = async (character: Character) => {
         gemSlots: item.gemSlots,
         requiredClass: item.requiredClass,
       })),
+      skills: character.skills.map(skill => ({
+        name: skill.name,
+        description: skill.description,
+        manaCost: skill.manaCost,
+      })),
     };
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(characterData));
     console.log("Character saved!");
@@ -27,6 +37,7 @@ export const saveCharacterState = async (character: Character) => {
     console.error("Error saving character state", error);
   }
 };
+
 // src/storage/StorageService.ts
 
 export const loadCharacterState = async (): Promise<Character | null> => {
@@ -36,20 +47,26 @@ export const loadCharacterState = async (): Promise<Character | null> => {
       const parsedData = JSON.parse(storedData);
       const character = new Character(
         parsedData.name,
-        parsedData.classType,
-        parsedData.level,
-        parsedData.equippedItems
-      );
-      character.equippedItems = parsedData.equippedItems.map((item: any) => {
-        return new Item(
+        parsedData.skills.map((skill: any) => new Skill(skill.name, skill.description, skill.manaCost)),
+        parsedData.equippedItems.map((item: any) => new Item(
           item.name,
           item.type,
           item.requiredClass,
           item.attackBonus,
           item.defenseBonus,
           item.gemSlots
-        );
-      });
+        )),
+        parsedData.classType
+      );
+
+      // Restore other character attributes
+      character.level = parsedData.level;
+      character.experience = parsedData.experience;
+      character.life = parsedData.life;
+      character.maxLife = parsedData.maxLife;
+      character.mana = parsedData.mana;
+      character.maxMana = parsedData.maxMana;
+
       console.log("Character loaded!");
       return character;
     }
@@ -59,3 +76,4 @@ export const loadCharacterState = async (): Promise<Character | null> => {
     return null;
   }
 };
+
