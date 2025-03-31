@@ -1,8 +1,7 @@
-// src/storage/StorageService.ts
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Character } from '../game/entities/Character';
 import { Item } from '../game/entities/Item';
+import { Skill } from '../game/entities/Skill'; // Import Skill class or type
 
 const STORAGE_KEY = '@game_state'; // The key we'll use to store the data
 
@@ -27,8 +26,11 @@ export const saveCharacterState = async (character: Character) => {
       })),
       skills: character.skills.map(skill => ({
         name: skill.name,
-        description: skill.description,
-        manaCost: skill.manaCost,
+        baseDamage: skill.baseDamage,
+        baseManaCost: skill.baseManaCost,
+        level: skill.level,
+        experience: skill.experience,
+        expToNextLevel: skill.expToNextLevel,
       })),
     };
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(characterData));
@@ -38,15 +40,13 @@ export const saveCharacterState = async (character: Character) => {
   }
 };
 
-// src/storage/StorageService.ts
-
 export const loadCharacterState = async (): Promise<Character | null> => {
   try {
     const storedData = await AsyncStorage.getItem(STORAGE_KEY);
     if (storedData) {
       const parsedData = JSON.parse(storedData);
       const character = new Character(
-        parsedData.name,
+        parsedData.skills.map((skill: any) => new Skill(skill.name, skill.power, skill.cooldown)), // Adjust constructor arguments
         parsedData.skills.map((skill: any) => new Skill(skill.name, skill.description, skill.manaCost)),
         parsedData.equippedItems.map((item: any) => new Item(
           item.name,
@@ -76,4 +76,3 @@ export const loadCharacterState = async (): Promise<Character | null> => {
     return null;
   }
 };
-

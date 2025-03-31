@@ -1,4 +1,4 @@
-// src/game/systems/SkillTraining.ts
+// src/game/systems/TrainingSystem.ts
 
 import { Character } from "../entities/Character";
 
