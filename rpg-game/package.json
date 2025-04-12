@@ -20,8 +20,11 @@
     "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
     "react-bootstrap": "^2.10.9",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
+    "react-native-polyfill-globals": "^3.1.0",
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-web": "~0.19.13",
     "timers": "^0.1.1"

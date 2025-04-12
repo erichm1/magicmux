@@ -5,10 +5,10 @@ import { Equipment } from '../game/entities/Equipment';
 
 // Insert a character
 export const saveCharacter = (character: Character) => {
-  db.transaction(tx => {
+  db.transaction((tx: any) => {
     tx.executeSql(
       `INSERT INTO characters (name, classType, level, experience, life, maxLife, mana, maxMana)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?);`Q,
       [
         character.name,
         character.classType,
@@ -19,14 +19,14 @@ export const saveCharacter = (character: Character) => {
         character.mana,
         character.maxMana
       ],
-      (_, result) => {
+      (_: any, result: any) => {
         const characterId = result.insertId;
         saveSkills(character.skills, characterId);
         saveEquipment(character.equippedItems.map(item => new Equipment(
           item.name
         )), characterId);
       },
-      (_, error) => {
+      (_: any, error: any) => {
         console.error('Error inserting character:', error);
         return false;
       }
@@ -67,11 +67,11 @@ const saveEquipment = (equipment: Equipment[], characterId: number) => {
 // Load all characters
 export const loadCharacters = async (): Promise<Character[]> => {
   return new Promise(resolve => {
-    db.transaction(tx => {
+    db.transaction((tx: any) => {
       tx.executeSql(
         `SELECT * FROM characters;`,
         [],
-        (_, { rows }) => {
+        (_: any, { rows }: { rows: any }) => {
           const characters: Character[] = [];
           for (let i = 0; i < rows.length; i++) {
             characters.push(rows.item(i));
@@ -90,11 +90,11 @@ export const loadCharacters = async (): Promise<Character[]> => {
 // Load a single character by name
 export const loadCharacterByName = async (name: string): Promise<Character | null> => {
   return new Promise(resolve => {
-    db.transaction(tx => {
+    db.transaction((tx: any) => {
       tx.executeSql(
         `SELECT * FROM characters WHERE name = ? LIMIT 1;`,
         [name],
-        async (_, { rows }) => {
+        async (_: any, { rows }: { rows: any }) => {
           if (rows.length > 0) {
             const characterData = rows.item(0);
             const skills = await loadSkills(characterData.id);
@@ -123,7 +123,7 @@ export const loadCharacterByName = async (name: string): Promise<Character | nul
 // Load skills for a character
 const loadSkills = async (characterId: number): Promise<Skill[]> => {
   return new Promise(resolve => {
-    db.transaction(tx => {
+    db.transaction((tx: any) => {
       tx.executeSql(
         `SELECT * FROM skills WHERE characterId = ?;`,
         [characterId],

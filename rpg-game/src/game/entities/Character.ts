@@ -133,6 +133,8 @@ export class Character {
         this.mana = Math.min(this.maxMana, this.mana + this.manaRegen);
     }
 
+
+    
     gainExperience(exp: number) {
         this.experience += exp;
         while (this.experience >= this.getExpToLevelUp()) {
@@ -219,9 +221,24 @@ export class Character {
         };
     }
 
-    getExpToLevelUp(): number {
-        return this.level * this.level * 50;  // Apply the new formula
-    }
+    getExpToLevelUp(level: number = this.level): number {
+        return level * level * 50;
+      }
+      
+      getTotalExperience(): number {
+        return this.experience;
+      }
+      
+      getExpProgressPercentage(): number {
+        const currentLevelXP = this.getExpToLevelUp(this.level);
+        const prevLevelXP = this.level > 1 ? this.getExpToLevelUp(this.level - 1) : 0;
+        const xpGainedThisLevel = this.experience - prevLevelXP;
+        const xpRequiredThisLevel = currentLevelXP - prevLevelXP;
+      
+        return (xpGainedThisLevel / xpRequiredThisLevel) * 100;
+      }
+      
+    
 
     attack(target: Character) {
         // Calcula o dano baseado no poder de ataque do personagem
@@ -237,6 +254,7 @@ export class Character {
         }
     }
 }
+
 
 // Exemplo de como garantir que o activeCharacter é uma instância de Character
 let parsedData = {
@@ -255,3 +273,5 @@ if (activeCharacter instanceof Character) {
 } else {
     console.log('activeCharacter não é uma instância de Character');
 }
+
+export default Character;

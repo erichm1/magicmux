@@ -1,4 +1,5 @@
 // src/game/entities/SkillTree.ts
+import { BaseStats } from "./BaseStats";
 
 export enum SkillTreeBranch {
   Offense = "Offense",

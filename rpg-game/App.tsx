@@ -7,9 +7,13 @@ import { HeroClass } from './src/game/entities/HeroClass';
 import { Monster, MonsterType } from './src/game/entities/Monster';
 import { saveCharacterState } from './src/storage/StorageService';
 import { loadMonsters, createMonster, updateMonster, createRandomMonster } from './src/storage/MonsterService';
-import { setupDatabase } from './src/storage/Database';
-
-setupDatabase();
+import SkillProgress from './src/components/SkillProgress';
+import EquipmentSlots from './src/components/EquipmentSlots';
+import { Equipment } from './src/game/entities/Equipment';
+import { Skill } from './src/game/entities/Skill';
+import ExperienceStatus from './src/components/ExperienceStatus';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const App = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -18,6 +22,7 @@ const App = () => {
   const [selectedClass, setSelectedClass] = useState<HeroClass>(HeroClass.Warrior);
   const [activeCharacter, setActiveCharacter] = useState<Character | null>(null);
   const [autoAttackInterval, setAutoAttackInterval] = useState<NodeJS.Timeout | null>(null);
+  const [backpackOpen, setBackpackOpen] = useState(false);
 
   // Modal controls
   const [monsterName, setMonsterName] = useState('');
@@ -114,7 +119,6 @@ const App = () => {
     }
   };
 
-  // Updated autoAttack using functional state updates for monsters
   const autoAttack = () => {
     if (!activeCharacter) return;
     setMonsters(prevMonsters => {
@@ -123,13 +127,11 @@ const App = () => {
         stopAutoAttack();
         return prevMonsters;
       }
-      // Select a random monster from the current list
       const targetMonsterIndex = Math.floor(Math.random() * prevMonsters.length);
       const targetMonster = prevMonsters[targetMonsterIndex];
       const attackDamage = activeCharacter.attackPower;
       const updatedMonster = { ...targetMonster, health: Math.max(0, targetMonster.health - attackDamage) };
 
-      // Create new monster list with updated health for the target monster
       let newMonsters = prevMonsters.map(monster => {
         if (monster.id === targetMonster.id) {
           return updatedMonster;
@@ -139,7 +141,6 @@ const App = () => {
 
       setDamageBadge(attackDamage);
 
-      // If the target monster is defeated, remove it and update character XP
       if (updatedMonster.health <= 0) {
         newMonsters = newMonsters.filter(monster => monster.id !== updatedMonster.id);
         const gainedXP = updatedMonster.xpOnKill;
@@ -154,7 +155,6 @@ const App = () => {
       } else {
         setBattleEffects(`Você causou ${attackDamage} de dano no monstro ${targetMonster.name}.`);
       }
-      // Update the monster in the database
       updateMonster(targetMonster.id, targetMonster.name, targetMonster.type, targetMonster.level);
       return newMonsters;
     });
@@ -166,7 +166,7 @@ const App = () => {
     }
     const interval = setInterval(() => {
       autoAttack();
-    }, 3000);
+    }, 50);
     setAutoAttackInterval(interval);
     console.log("Auto attack started with interval ID: ", interval);
   };
@@ -180,12 +180,13 @@ const App = () => {
   };
 
   const handleCreateRandomMonster = async () => {
-    const level = 1;
+    const level = Math.floor(Math.random() * 100) + 2;
     const newMonster = await createRandomMonster(level);
     setMonsters(prevMonsters => [...prevMonsters, newMonster]);
   };
 
   return (
+    <DndProvider backend={HTML5Backend}>
     <Container className="mt-5">
       {!activeCharacter ? (
         <>
@@ -196,18 +197,18 @@ const App = () => {
                 <Card.Body>
                   <Form>
                     <Form.Group className="mb-3">
-                      <Form.Control 
-                        type="text" 
-                        placeholder="Nome do personagem" 
-                        value={name} 
+                      <Form.Control
+                        type="text"
+                        placeholder="Nome do personagem"
+                        value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
                     </Form.Group>
                     <Row className="mb-3">
                       {Object.values(HeroClass).map((hero) => (
                         <Col key={hero} xs={6} className="mb-2">
-                          <Button 
-                            variant={selectedClass === hero ? "warning" : "secondary"} 
+                          <Button
+                            variant={selectedClass === hero ? "warning" : "secondary"}
                             className="w-100"
                             onClick={() => setSelectedClass(hero)}
                           >
@@ -247,41 +248,125 @@ const App = () => {
         </>
       ) : (
         <Row className="justify-content-center">
-          <Col md={8} lg={6}>
+          <Col md={1} lg={3}>
             <Card className="text-center bg-dark text-light border-primary">
-              <Card.Header className="fw-bold text-primary">Jogo Iniciado</Card.Header>
+            <Card.Header className="fw-bold text-primary">magicmux</Card.Header>
               <Card.Body>
-                <h3>{activeCharacter.name}</h3>
-                <p>Classe: {activeCharacter.classType}</p>
-                <p>Nível: {activeCharacter.level}</p>
-                <p>XP: {activeCharacter.experience} / {activeCharacter.getExpToLevelUp()}</p>
-                <Button 
-                  variant="danger" 
-                  onClick={() => handleAttack(activeCharacter)} 
-                  className="w-100 mt-3"
+                <Button
+                  variant="danger"
+                  onClick={() => handleAttack(activeCharacter)}
+                  className="w-100 mt-2"
                 >
-                  Atacar Monstro
+                attack
                 </Button>
                 <Button
                   variant="danger"
                   onClick={startAutoAttack}
-                  className="w-100 mt-3"
+                  className="w-100 mt-2"
                 >
-                  Atacar Automaticamente
+                  auto
                 </Button>
                 <Button
                   variant="secondary"
                   onClick={stopAutoAttack}
-                  className="w-100 mt-3"
+                  className="w-100 mt-2"
                 >
-                  Parar Atacar Automaticamente
+                  stop
                 </Button>
-                <Button variant="secondary" onClick={() => setActiveCharacter(null)} className="w-100 mt-3">
-                  Sair do Jogo
+                <Button variant="secondary" onClick={() => setActiveCharacter(null)} className="w-100 mt-2">
+                  quit
                 </Button>
+                <Button variant="success" className="w-100 mt-2" onClick={() => setShowModal(true)}>
+                +monster
+              </Button>
+              <Button
+                variant="info"
+                className="w-100 mt-2"
+                onClick={handleCreateRandomMonster}
+              >
+                random monster
+              </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={8} lg={6}>
+            <Card className="text-center bg-dark text-light border-primary">
+              <Card.Body>
+                <h3>{activeCharacter.name} [{activeCharacter.level}]</h3>
+                <p>{activeCharacter.classType}</p>
+                <EquipmentSlots
+                  equipment={{
+                    Capacete: new Equipment('Iron Helmet'),
+                    Armadura: new Equipment('Iron Armor'),
+                    Arma: new Equipment('Iron Sword'),
+                    Escudo: new Equipment('Iron Shield'),
+                    Botas: new Equipment('Iron Boots'),
+                    Luvas: new Equipment('Iron Gloves'),
+                    Anel: new Equipment('Iron Ring'),
+                    Amuleto: new Equipment('Iron Amulet'),
+                    Mochila: new Equipment('Blue Backpack'),
+                  }}
+                />
+                <p>XP: {activeCharacter.getTotalExperience()}</p>
+                <p>
+                 {activeCharacter.experience} / {activeCharacter.getExpToLevelUp()} 
+                  ({activeCharacter.getExpProgressPercentage().toFixed(2)}%)
+                </p>
+                <ProgressBar
+                  now={activeCharacter.getExpProgressPercentage()}
+                  label={`${activeCharacter.getExpProgressPercentage().toFixed(2)}%`}
+                />
+                <div>
+                  {[
+                    { name: "Força", value: activeCharacter.strength },
+                    { name: "Inteligência", value: activeCharacter.intelligence },
+                    { name: "Agilidade", value: activeCharacter.agility },
+                  ].map((attr, idx) => (
+                    <SkillProgress key={idx} name={attr.name} value={attr.value} />
+                  ))}
+                </div>
                 {battleEffects && <div className="mt-3 text-success">{battleEffects}</div>}
               </Card.Body>
             </Card>
+            <Card className="mt-3 bg-dark text-light border-success">
+            <Card.Header
+              className="fw-bold text-success d-flex justify-content-between align-items-center"
+              onClick={() => setBackpackOpen(!backpackOpen)}
+              style={{ cursor: 'pointer' }}
+            >
+              Backpack
+              <span>{backpackOpen ? '▲' : '▼'}</span>
+            </Card.Header>
+            {backpackOpen && (
+              <Card.Body>
+                <Row>
+                  {Array.from({ length: 60 }).map((_, index) => (
+                    <Col xs={3} key={index} className="mb-2">
+                      <div className="p-2 bg-secondary rounded text-center border border-light">
+                        <div>Slot {index + 1}</div>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              </Card.Body>
+            )}
+          </Card>
+
+          <Card className="mt-3 bg-dark text-light border-info">
+            <Card.Header className="fw-bold text-info">Inventory</Card.Header>
+            <Card.Body>
+              <Row>
+                {["Health Potion", "Mana Potion", "Rope", "Torch"].map((item, index) => (
+                  <Col xs={6} key={index} className="mb-2">
+                    <div className="p-2 bg-secondary rounded text-center border border-light">
+                      <div>{item}</div>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            </Card.Body>
+          </Card>
+
           </Col>
         </Row>
       )}
@@ -341,9 +426,9 @@ const App = () => {
                       </Badge>
                     </div>
                     <Card.Text>Tipo: {monster.type} - Nível {monster.level}</Card.Text>
-                    <ProgressBar 
-                      now={(monster.health / monster.maxHealth) * 100} 
-                      label={`${monster.health} / ${monster.maxHealth}`} 
+                    <ProgressBar
+                      now={(monster.health / monster.maxHealth) * 100}
+                      label={`${monster.health} / ${monster.maxHealth}`}
                     />
                     <Button variant="warning" onClick={() => handleEditMonster(monster)}>
                       Editar
@@ -355,17 +440,8 @@ const App = () => {
           </Row>
         </Col>
       </Row>
-      <Button variant="success" className="w-100 mt-5" onClick={() => setShowModal(true)}>
-        Criar Monstro
-      </Button>
-      <Button 
-        variant="info" 
-        className="w-100 mt-5" 
-        onClick={handleCreateRandomMonster}
-      >
-        Criar Monstro Aleatório
-      </Button>
     </Container>
+  </DndProvider>
   );
 };
 
