@@ -37,6 +37,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    ## packages
+    'rest_framework',
+    'corsheaders',
+
+    ## apps
+    'abilities',
+    'accounts',
+    'bosses',
+    'characters',
+    'combat',
+    'core',
+    'economy',
+    'guild',
+    'items',
+    'monsters',
+    'quests',
+    'raids',
+    'skills',
+    'trees',
+    'world',
 ]
 
 MIDDLEWARE = [
@@ -47,7 +68,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",]
+CORS_ALLOW_ALL_ORIGINS = True  # ou use CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
 
 ROOT_URLCONF = 'magicmux.urls'
 
@@ -113,6 +136,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = 'static/'
 

@@ -24,7 +24,7 @@ class MapTile(models.Model):
     tile_type = models.ForeignKey(TileType, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.map
+        return f"MapTile({self.map.name}, x={self.x}, y={self.y})"
 
     class Meta:
         unique_together = ('map', 'x', 'y')
@@ -35,9 +35,13 @@ class MapZone(models.Model):
     level_required = models.IntegerField(default=1)
     is_safe_zone = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.name
+
+
 class Monster(models.Model):
     name = models.CharField(max_length=30)
-    zone = models.ForeignKey(MapZone, on_delete=models.CASCADE)
+    zone = models.ForeignKey(MapZone, on_delete=models.CASCADE, related_name='monsters_from_world_app')
     hp = models.IntegerField()
     damage = models.IntegerField()
     drop_table = models.JSONField(default=list)
@@ -48,3 +52,6 @@ class Monster(models.Model):
     image = models.ImageField(upload_to='monsters/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
