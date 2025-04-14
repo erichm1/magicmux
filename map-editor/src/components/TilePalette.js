@@ -21,7 +21,7 @@ const TilePalette = () => {
           }`}
           onClick={() => setSelectedTile(tile)}
         >
-          <img src={`http://localhost:8004${tile.image}`} alt={tile.name} className="w-full" />
+          <img src={`http://127.0.0.1:8004${tile.image}`} alt={tile.name} className="w-full" />
           <div className="text-center text-sm">{tile.name}</div>
         </div>
       ))}

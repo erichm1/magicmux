@@ -28,7 +28,7 @@ const MapGrid = () => {
           >
             {cell && (
               <img
-                src={`http://localhost:8004/${cell.image}`}
+                src={`http://127.0.0.1:8004/${cell.image}`}
                 alt=""
                 className="w-full h-full object-cover"
               />
