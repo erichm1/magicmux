@@ -10,12 +10,19 @@ class TileTypeSerializer(serializers.ModelSerializer):
 
 class MapTileSerializer(serializers.ModelSerializer):
     tile_type = TileTypeSerializer(read_only=True)
-    tile_type_id = serializers.PrimaryKeyRelatedField(queryset=TileType.objects.all(), source='tile_type', write_only=True)
+    tile_type_id = serializers.PrimaryKeyRelatedField(
+        queryset=TileType.objects.all(), source='tile_type', write_only=True
+    )
+
+    map_id = serializers.PrimaryKeyRelatedField(
+        queryset=Map.objects.all(), source='map', write_only=True
+    )
 
     class Meta:
         model = MapTile
-        fields = ['id', 'x', 'y', 'tile_type', 'tile_type_id']
+        fields = ['id', 'x', 'y', 'tile_type', 'tile_type_id', 'map_id']
         read_only_fields = ['id']
+
 
 
 class MapSerializer(serializers.ModelSerializer):

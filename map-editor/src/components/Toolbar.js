@@ -55,6 +55,7 @@ const Toolbar = ({
       }
     }
     setTiles(newTiles);
+    console.log(newTiles)
   };
 
   const handleLoadMap = async (id) => {
@@ -85,7 +86,7 @@ const Toolbar = ({
     <div className="toolbar p-4 border-r w-64">
       <input
         className="w-full p-2 border mb-2"
-        placeholder="Nome do mapa"
+        placeholder="Map Name"
         value={mapName}
         onChange={(e) => setMapName(e.target.value)}
       />
@@ -105,11 +106,11 @@ const Toolbar = ({
           placeholder="Altura"
         />
       </div>
-      <button onClick={handleGridResize} className="w-full bg-yellow-500 text-white p-2 rounded mb-2">Redimensionar</button>
-      <button onClick={handleSaveMap} className="w-full bg-green-600 text-white p-2 rounded mb-2">Salvar Mapa</button>
-      <button onClick={() => handleLoadMap(1)} className="w-full bg-blue-500 text-white p-2 rounded mb-4">Carregar Mapa 1</button>
+      <button onClick={handleGridResize} className="w-full bg-yellow-500 text-white p-2 rounded mb-2">resize</button>
+      <button onClick={handleSaveMap} className="w-full bg-green-600 text-white p-2 rounded mb-2">save</button>
+      <button onClick={() => handleLoadMap(24)} className="w-full bg-blue-500 text-white p-2 rounded mb-4">load</button>
 
-      <div className="font-bold mb-1">Tiles:</div>
+      <div className="font-bold mb-1">Tiles</div>
       <div className="grid grid-cols-3 gap-2">
       {Array.isArray(tileTypes) && tileTypes.map(tile => (
         <div
