@@ -16,7 +16,7 @@ const ExperienceStatus: React.FC<Props> = ({ activeCharacter }) => {
     <div>
       <p>XP Total: {xpTotal}</p>
       <p>
-        Progresso no Nível: {activeCharacter.experience} / {requiredXP} 
+        Progresso no Nível: {activeCharacter.getTotalExperience} / {requiredXP} 
         ({progress.toFixed(2)}%)
       </p>
       <ProgressBar

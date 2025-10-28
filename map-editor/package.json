@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^1.8.4",
+    "clsx": "^2.1.1",
     "cra-template-pwa": "2.0.0",
     "react": "^19.1.0",
     "react-dnd": "^16.0.1",
